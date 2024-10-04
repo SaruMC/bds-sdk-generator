@@ -38,5 +38,5 @@ To run the Docker container:
 podman run --rm bds-sdk-gen
 ```
 
-### Important Note
-Microsoft has decided to remove PDB files from the BDS sources as of the latest versions. As a result, we cannot generate headers for BDS versions released after the latest version available at https://mcbds.reh.tw/. Please ensure that you are using a compatible version available from this resource.
+> [!IMPORTANT]
+> Microsoft has decided to remove PDB files from the BDS sources as of the latest versions. As a result, we cannot generate headers for BDS versions released after the latest version available at https://mcbds.reh.tw/. Please ensure that you are using a compatible version available from this resource.
