@@ -1,4 +1,4 @@
-#include <llvm-14/llvm/Demangle/Demangle.h>
+#include <llvm/Demangle/Demangle.h>
 
 #include "Logger.h"
 
@@ -21,9 +21,7 @@ int main(int argc, char *argv[]) {
     }
 
     Logger::info("Loading symbols from given pdb file...");
-    auto syms = "";
-
-
+    // auto syms = loadPDBFile(fileName);
 
     return EXIT_SUCCESS;
 }
