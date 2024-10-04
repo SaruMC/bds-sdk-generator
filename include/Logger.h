@@ -20,7 +20,7 @@ public:
     }
 
     static void error(std::string text) {
-        std::cout << "\033[31m" << PREFIX << " - [ERROR]: " << text << std::endl;
+        std::cerr << "\033[31m" << PREFIX << " - [ERROR]: " << text << std::endl;
     }
 
     static void debug(std::string text) {
