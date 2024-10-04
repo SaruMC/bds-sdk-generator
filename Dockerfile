@@ -39,7 +39,7 @@ RUN apt-get update && \
 ARG BDS_VERSION=1.21.32.04
 
 # Define and compare with the maximum allowed version (after that microsoft doesn't release the PDB file anymore..)
-ENV MAX_BDS_VERSION=1.16.201.2
+ENV MAX_BDS_VERSION=1.16.201.02
 
 # Compare the BDS version with MAX_BDS_VERSION
 # If BDS_VERSION is greater than MAX_BDS_VERSION, exit with an error
@@ -76,13 +76,16 @@ RUN ninja
 WORKDIR /usr/src/app
 
 # Download the bedrock server zip file
-RUN wget https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-${BDS_VERSION}.zip -O bedrock-server.zip
+# RUN wget https://www.minecraft.net/bedrockdedicatedserver/bin-win/bedrock-server-${BDS_VERSION}.zip -O bedrock-server.zip
+
+RUN BDS_ZIP_URL="https://minecraft.azureedge.net/bin-win/bedrock-server-${BDS_VERSION}.zip" && \
+    wget "$BDS_ZIP_URL" -O bedrock-server.zip
 
 # Unzip the downloaded file to a specified directory
 RUN unzip bedrock-server.zip -d bedrock-server
 
 # Assuming there is a PDB file named bedrock_server.pdb in the extracted contents
 # You can move it to a desired location or make it available to your application
-RUN cp bedrock-server/bedrock_server.pdb .
+RUN cp bedrock-server/bedrock_server.pdb bin/bedrock_server.pdb
 
-ENTRYPOINT ["./build/bin/bds-sdk-generator"]
+ENTRYPOINT ["./bin/bds-sdk-generator", "./bin/bedrock_server.pdb"]
