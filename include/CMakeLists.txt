@@ -1,1 +1,0 @@
-target_sources(SDKGenerator PRIVATE MemoryMappedFile.h)
