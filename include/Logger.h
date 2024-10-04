@@ -1,11 +1,7 @@
-//
-// Created by aldauge on 04/10/24.
-//
+#pragma once
 
 #ifndef LOGGER_H
 #define LOGGER_H
-
-#pragma once
 
 #include <string>
 #include <iostream>
