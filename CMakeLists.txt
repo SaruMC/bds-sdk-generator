@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.30.4)
+cmake_minimum_required(VERSION 3.29.3)
 project(bds-sdk-generator)
 
 find_package(LLVM REQUIRED CONFIG)
