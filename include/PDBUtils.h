@@ -3,19 +3,17 @@
 #ifndef PDBUTILS_H
 #define PDBUTILS_H
 
-#include "MemoryMappedFile.h"
 #include "DemangledSymbol.h"
 
-#include <llvm/DebugInfo/PDB/Raw/PDBFile.h>
-#include <llvm/DebugInfo/PDB/Raw/RawFile.h>
-#include <llvm/DebugInfo/PDB/Raw/DBIStream.h>
-
 #include <vector>
+#include <string>
+#include <llvm/DebugInfo/PDB/IPDBSession.h>
+#include <llvm/DebugInfo/PDB/GenericError.h>
 
 class PDBUtils {
 private:
     std::vector<DemangledSymbol*> symbols;
-    bool hasValidDBIStreams(const PDB::RawFile& rawPdbFile, const PDB::DBIStream& dbiStream);
+    bool hasValidDBIStreams(const llvm::pdb::IPDBSession& session, const llvm::pdb::PDBSymbolExe& exe);
 
 public:
     std::vector<DemangledSymbol*>* loadPdb();
