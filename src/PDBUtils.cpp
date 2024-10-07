@@ -9,12 +9,21 @@
 #include <vector>
 #include <mutex>
 #include <iomanip>
+#include <memory>
 
-#include "../include/PDB/PDB.h"
-#include "../include/PDB/PDB_RawFile.h"
-#include "../include/PDB/PDB_InfoStream.h"
-#include "../include/PDB/PDB_DBIStream.h"
-#include "../include/PDB/Foundation/PDB_DisableWarningsPop.h"
+#include "PDB/PDB.h"
+#include "PDB/PDB_RawFile.h"
+#include "PDB/PDB_DBIStream.h"
+#include "PDB/PDB_InfoStream.h"
+#include "PDB/PDB_ErrorCodes.h"
+#include "PDB/PDB_InfoStream.h"
+#include "PDB/Foundation/PDB_DisableWarningsPop.h"
+
+#include <llvm/Demangle/Demangle.h>
+
+#include "Logger.h"
+#include "DemangledSymbol.h"
+#include "MemoryMappedFile.h"
 
 using std::string, std::vector;
 
@@ -62,14 +71,22 @@ namespace
 
 class PDBUtils {
 private:
-    vector<DemangledSymbol*>* symbols;
+    std::unique_ptr<vector<DemangledSymbol*>> symbols = std::make_unique<vector<DemangledSymbol*>>();
 
 public:
+    ~PDBUtils()
+    {
+        for (auto symbol : *symbols)
+        {
+            delete symbol;
+        }
+    }
+
     void getClassFromSymbol(std::string className, std::vector<DemangledSymbol*>* symbols)
     {
-        for (int i = 0; i <= symbols->size(); i++) {
-            DemangledSymbol* symbol = symbols->at(i);
-
+        for (auto symbol : *symbols)
+        {
+            // Convention calling
             if (symbol->value.find("__cdecl " + className + "::") != std::string::npos) {
                 // ToDo
                 Logger::debug(std::to_string(symbol->offset));
@@ -79,7 +96,7 @@ public:
 
     vector<DemangledSymbol*>* parsePdb(const PDB::RawFile& rawPdbFile, const PDB::DBIStream& dbiStream)
     {
-        symbols = new vector<DemangledSymbol*>;
+        symbols = std::make_unique<vector<DemangledSymbol*>>();
 
         const PDB::ImageSectionStream imageSectionStream = dbiStream.CreateImageSectionStream(rawPdbFile);
         const PDB::CoalescedMSFStream symbolRecordStream = dbiStream.CreateSymbolRecordStream(rawPdbFile);
@@ -97,7 +114,7 @@ public:
                     continue;
 
                 auto sym = new DemangledSymbol;
-                sym->value = Demangler::PlsDemangleLmao(record->data.S_PUB32.name);
+                sym->value = llvm::demangle(record->data.S_PUB32.name);
                 sym->rva = rva;
                 sym->offset = record->data.S_PUB32.offset;
 
@@ -105,24 +122,24 @@ public:
             }
         }
 
-        return symbols;
+        return symbols.get();
     }
 
     vector<DemangledSymbol*>* loadPdb()
     {
         const wchar_t* const pdbPath = LR"(./bedrock_server.pdb)";
-        Handle pdbFile = MemoryMappedFile::Open(pdbPath);
+        MemoryMappedFileHandle pdbFile = MemoryMappedFile::Open(pdbPath);
 
         if (!pdbFile.baseAddress)
         {
             Logger::info("[PDB] PDB file not found");
-            return NULL;
+            return nullptr;
         }
 
         if (IsError(PDB::ValidateFile(pdbFile.baseAddress)))
         {
             MemoryMappedFile::Close(pdbFile);
-            return NULL;
+            return nullptr;
         }
 
         const PDB::RawFile rawPdbFile = PDB::CreateRawFile(pdbFile.baseAddress);
@@ -130,7 +147,7 @@ public:
         if (IsError(PDB::HasValidDBIStream(rawPdbFile)))
         {
             MemoryMappedFile::Close(pdbFile);
-            return NULL;
+            return nullptr;
         }
 
         const PDB::InfoStream infoStream(rawPdbFile);
@@ -138,7 +155,7 @@ public:
         if (infoStream.UsesDebugFastLink())
         {
             MemoryMappedFile::Close(pdbFile);
-            return NULL;
+            return nullptr;
         }
 
         const PDB::DBIStream dbiStream = PDB::CreateDBIStream(rawPdbFile);
@@ -146,7 +163,7 @@ public:
         if (!HasValidDBIStreams(rawPdbFile, dbiStream))
         {
             MemoryMappedFile::Close(pdbFile);
-            return NULL;
+            return nullptr;
         }
 
         return parsePdb(rawPdbFile, dbiStream);

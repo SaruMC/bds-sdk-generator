@@ -3,13 +3,11 @@
 #ifndef PDBUTILS_H
 #define PDBUTILS_H
 
-#include "DemangledSymbol.h"
-#include "PDB/PDB_RawFile.h"
-#include "PDB/PDB_ErrorCodes.h"
-#include "PDB/PDB_DBIStream.h"
-#include "PDB/PDB_InfoStream.h"
-
 #include <vector>
+#include "DemangledSymbol.h"
+
+#include "PDB/PDB_RawFile.h"
+#include "PDB/PDB_DBIStream.h"
 
 class PDBUtils {
 private:
