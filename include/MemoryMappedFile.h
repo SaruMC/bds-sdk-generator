@@ -18,7 +18,7 @@ struct MemoryMappedFileHandle {
 class MemoryMappedFile {
   public:
     static MemoryMappedFileHandle Open(const char* filename, const char* mode);
-    static void Close(MemoryMappedFileHandle handle);
+    static void Close(const MemoryMappedFileHandle &handle);
 };
 
 #endif //MEMORYMAPPEDFILE_H
