@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
   Logger::info("Loading symbols from given pdb file...");
   PDBUtils pdbUtils;
-  const auto symbols = pdbUtils.loadPdb(fileName);
+  const auto symbols = pdbUtils.loadPdb(fileName.c_str());
 
   if (!symbols) {
     Logger::error("Failed to load symbols from the pdb file");
