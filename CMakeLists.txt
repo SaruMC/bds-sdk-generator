@@ -12,11 +12,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
+# Enable Microsoft-specific extensions for declspec support
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdeclspec -fms-extensions")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdeclspec -fms-extensions")
+
 # Include the directory where your headers are located
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Add all source files to the target
-add_executable(bds-sdk-generator main.cpp src/MemoryMappedFile.cpp)
+add_executable(bds-sdk-generator main.cpp src/MemoryMappedFile.cpp src/PDBUtils.cpp)
 
 # Link against the necessary LLVM libraries
 target_link_libraries(bds-sdk-generator ${LLVM_LIBS} LLVMCore LLVMDemangle)
