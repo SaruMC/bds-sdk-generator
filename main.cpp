@@ -3,20 +3,23 @@
 #include "Logger.h"
 #include "PDBUtils.h"
 
-#include <filesystem>
 #include <iostream>
+#include <filesystem>
+#include <string>
 
+namespace fs = std::filesystem;
 using namespace std;
 
-int main(int argc, char *argv[]) {
+int main(const int argc, char *argv[]) {
   if (argc != 2) {
     cerr << "Usage: " << argv[0] << " <filename>" << endl;
     return EXIT_FAILURE;
   }
 
-  const string fileName = argv[1];
-  if (filesystem::exists(fileName) || fileName.size() <= 4 || fileName.substr(fileName.size() - 4) != ".pdb") {
-    Logger::error("The given file is either not existsing or not a .pdb file");
+  const std::string fileName = argv[1];
+
+  if (!fs::exists(fileName) || fileName.size() < 5 || fileName.substr(fileName.size() - 4) != ".pdb") {
+    Logger::error("The given file either does not exist or is not a .pdb file");
     return EXIT_FAILURE;
   }
 
@@ -31,10 +34,7 @@ int main(int argc, char *argv[]) {
 
   Logger::info("Symbols loaded successfully!");
 
-  for (const auto& symbol : *symbols) {
-    cout << "Symbol: " << symbol->value << " | RVA: " << symbol->rva << " | Offset: " << symbol->offset << endl;
-  }
-
+  pdbUtils.getClassFromSymbol("Actor", symbols);
   delete symbols;
 
   return EXIT_SUCCESS;
