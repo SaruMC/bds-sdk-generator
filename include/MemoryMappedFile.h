@@ -10,15 +10,15 @@
 #include <fcntl.h>
 
 struct MemoryMappedFileHandle {
-    int fd;
-    size_t size;
-    void* baseAddress;
+  int fd;
+  size_t size;
+  void* baseAddress;
 };
 
 class MemoryMappedFile {
-  public:
-    static MemoryMappedFileHandle Open(const char* filename, const char* mode);
-    static void Close(const MemoryMappedFileHandle &handle);
+public:
+  static MemoryMappedFileHandle Open(const char* filename, const char* mode);
+  static void Close(const MemoryMappedFileHandle &handle);
 };
 
-#endif //MEMORYMAPPEDFILE_H
+#endif // MEMORYMAPPEDFILE_H
