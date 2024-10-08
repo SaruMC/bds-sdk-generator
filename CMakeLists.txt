@@ -18,11 +18,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdeclspec -fms-extensions")
 
 # Include the directory where your headers are located
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/PDB)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/PDB/Foundation)
+
+# Link directories where the precompiled libraries are located
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs)
 
 # Add all source files to the target
 add_executable(bds-sdk-generator main.cpp src/MemoryMappedFile.cpp src/PDBUtils.cpp)
 
-# Link against the necessary LLVM libraries
+# Link the PDB library and necessary LLVM libraries
 target_link_libraries(bds-sdk-generator ${LLVM_LIBS} LLVMCore LLVMDemangle)
 
 # Optionally set the output directory for the executable
