@@ -10,6 +10,11 @@ class Logger {
 private:
     static const std::string PREFIX;
 
+    static const std::string COLOR_RED;
+    static const std::string COLOR_GREEN;
+    static const std::string COLOR_RESET;
+    static const std::string COLOR_YELLOW;
+
 public:
     static void info(const std::string& text);
     static void error(const std::string& text);
