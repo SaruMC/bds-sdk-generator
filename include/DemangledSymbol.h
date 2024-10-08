@@ -1,9 +1,10 @@
-#pragma once
-
 #ifndef DEMANGLEDSYMBOL_H
 #define DEMANGLEDSYMBOL_H
 
+#pragma once
+
 #include <string>
+#include <cstdint>
 
 struct DemangledSymbol {
   std::string value;
