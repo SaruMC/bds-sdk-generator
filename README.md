@@ -35,7 +35,7 @@ Replace `<desired_version>` with the desired BDS version you wish to use. For ex
 To run the Docker container:
 
 ```shell
-podman run --rm bds-sdk-gen
+podman run --rm -v $(pwd)/bin:/usr/src/app/bin bds-sdk-gen
 ```
 
 ### Important Note
