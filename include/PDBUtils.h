@@ -5,7 +5,6 @@
 
 #include <vector>
 #include "DemangledSymbol.h"
-
 #include "PDB/PDB_RawFile.h"
 #include "PDB/PDB_DBIStream.h"
 
@@ -15,8 +14,11 @@ private:
     bool hasValidDBIStreams(const PDB::RawFile& rawPdbFile, const PDB::DBIStream& dbiStream);
 
 public:
-    std::vector<DemangledSymbol*>* loadPdb();
+    ~PDBUtils();  // Destructor declaration
+
+    std::vector<DemangledSymbol*>* loadPdb( const char* fileName);
     void getClassFromSymbol(const std::string& className, std::vector<DemangledSymbol*>* symbols);
+    std::vector<DemangledSymbol*>* parsePdb(const PDB::RawFile& rawPdbFile, const PDB::DBIStream& dbiStream);  // Added parsePdb declaration
 };
 
-#endif //PDBUTILS_H
+#endif // PDBUTILS_H
