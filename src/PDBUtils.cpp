@@ -123,48 +123,52 @@ public:
         return symbols.get();
     }
 
-    vector<DemangledSymbol*>* loadPdb()
-    {
-        const wchar_t* const pdbPath = LR"(./bedrock_server.pdb)";
-        MemoryMappedFileHandle pdbFile = MemoryMappedFile::Open(pdbPath);
+  std::vector<DemangledSymbol*>* loadPdb() {
+      const char* const pdbPath = "./bedrock_server.pdb";
+      const char* mode = "r";  // Specify the mode: read-only
 
-        if (!pdbFile.baseAddress)
-        {
-            Logger::info("[PDB] PDB file not found");
-            return nullptr;
-        }
+      MemoryMappedFileHandle pdbFile;
 
-        if (IsError(PDB::ValidateFile(pdbFile.baseAddress)))
-        {
-            MemoryMappedFile::Close(pdbFile);
-            return nullptr;
-        }
+      try {
+        pdbFile = MemoryMappedFile::Open(pdbPath, mode);
+      } catch (const std::runtime_error &e) {
+        Logger::info("[PDB] Error opening PDB file: " + std::string(e.what()));
+        return nullptr;
+      }
 
-        const PDB::RawFile rawPdbFile = PDB::CreateRawFile(pdbFile.baseAddress);
+      if (!pdbFile.baseAddress) {
+        Logger::info("[PDB] PDB file not found");
+        MemoryMappedFile::Close(pdbFile);  // Ensure proper resource cleanup
+        return nullptr;
+      }
 
-        if (IsError(PDB::HasValidDBIStream(rawPdbFile)))
-        {
-            MemoryMappedFile::Close(pdbFile);
-            return nullptr;
-        }
+      if (IsError(PDB::ValidateFile(pdbFile.baseAddress))) {
+        MemoryMappedFile::Close(pdbFile);
+        return nullptr;
+      }
 
-        const PDB::InfoStream infoStream(rawPdbFile);
+      const PDB::RawFile rawPdbFile = PDB::CreateRawFile(pdbFile.baseAddress);
 
-        if (infoStream.UsesDebugFastLink())
-        {
-            MemoryMappedFile::Close(pdbFile);
-            return nullptr;
-        }
+      if (IsError(PDB::HasValidDBIStream(rawPdbFile))) {
+        MemoryMappedFile::Close(pdbFile);
+        return nullptr;
+      }
 
-        const PDB::DBIStream dbiStream = PDB::CreateDBIStream(rawPdbFile);
+      const PDB::InfoStream infoStream(rawPdbFile);
 
-        if (!HasValidDBIStreams(rawPdbFile, dbiStream))
-        {
-            MemoryMappedFile::Close(pdbFile);
-            return nullptr;
-        }
+      if (infoStream.UsesDebugFastLink()) {
+        MemoryMappedFile::Close(pdbFile);
+        return nullptr;
+      }
 
-        return parsePdb(rawPdbFile, dbiStream);
+      const PDB::DBIStream dbiStream = PDB::CreateDBIStream(rawPdbFile);
+
+      if (!HasValidDBIStreams(rawPdbFile, dbiStream)) {
+        MemoryMappedFile::Close(pdbFile);
+        return nullptr;
+      }
+
+      return parsePdb(rawPdbFile, dbiStream);
     }
 };
 
