@@ -17,7 +17,7 @@ public:
     ~PDBUtils();  // Destructor declaration
 
     std::vector<DemangledSymbol*>* loadPdb(const char* fileName);
-    void getClassFromSymbol(const std::string& className, std::vector<DemangledSymbol*>* symbols);
+    static std::vector<std::string>* getClassFromSymbol(const std::string& className, std::vector<DemangledSymbol*>* symbols);
     std::vector<DemangledSymbol*>* parsePdb(const PDB::RawFile& rawPdbFile, const PDB::DBIStream& dbiStream);  // Added parsePdb declaration
 };
 

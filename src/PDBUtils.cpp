@@ -27,7 +27,7 @@
 using std::string, std::vector;
 
 namespace {
-    PDB_NO_DISCARD static bool IsError(PDB::ErrorCode errorCode) {
+    PDB_NO_DISCARD bool IsError(PDB::ErrorCode errorCode) {
         switch (errorCode) {
             case PDB::ErrorCode::Success:
                 return false;
@@ -50,7 +50,7 @@ namespace {
         return true;
     }
 
-    PDB_NO_DISCARD static bool HasValidDBIStreams(const PDB::RawFile& rawPdbFile, const PDB::DBIStream& dbiStream) {
+    PDB_NO_DISCARD bool HasValidDBIStreams(const PDB::RawFile& rawPdbFile, const PDB::DBIStream& dbiStream) {
         if (IsError(dbiStream.HasValidImageSectionStream(rawPdbFile))) return false;
         if (IsError(dbiStream.HasValidPublicSymbolStream(rawPdbFile))) return false;
         if (IsError(dbiStream.HasValidGlobalSymbolStream(rawPdbFile))) return false;
@@ -65,23 +65,26 @@ PDBUtils::~PDBUtils() {
     }
 }
 
-void PDBUtils::getClassFromSymbol(const std::string& className, std::vector<DemangledSymbol*>* symbols) {
-    for (auto symbol : *symbols) {
-        // Convention calling
-        if (symbol->value.find("__cdecl " + className + "::") != std::string::npos) {
-            // ToDo
-            Logger::debug(className + "::" + symbol->value);
-        }
+std::vector<std::string>* PDBUtils::getClassFromSymbol(const std::string& className, std::vector<DemangledSymbol*>* symbols) {
+  auto* matchedSymbols = new std::vector<std::string>;
+
+  for (const auto& symbol : *symbols) {
+    // Convention calling
+    if (symbol->value.find("__cdecl " + className + "::") != std::string::npos) {
+      matchedSymbols->push_back(className + "::" + symbol->value);
     }
+  }
+
+  return matchedSymbols;
 }
 
 std::vector<DemangledSymbol*>* PDBUtils::parsePdb(const PDB::RawFile& rawPdbFile, const PDB::DBIStream& dbiStream) {
     symbols.clear();
-
-    const PDB::ImageSectionStream imageSectionStream = dbiStream.CreateImageSectionStream(rawPdbFile);
-    const PDB::CoalescedMSFStream symbolRecordStream = dbiStream.CreateSymbolRecordStream(rawPdbFile);
-    const PDB::PublicSymbolStream publicSymbolStream = dbiStream.CreatePublicSymbolStream(rawPdbFile);
     {
+      const PDB::ImageSectionStream imageSectionStream = dbiStream.CreateImageSectionStream(rawPdbFile);
+      const PDB::CoalescedMSFStream symbolRecordStream = dbiStream.CreateSymbolRecordStream(rawPdbFile);
+      const PDB::PublicSymbolStream publicSymbolStream = dbiStream.CreatePublicSymbolStream(rawPdbFile);
+
         const PDB::ArrayView<PDB::HashRecord> hashRecords = publicSymbolStream.GetRecords();
         const size_t count = hashRecords.GetLength();
 
@@ -105,12 +108,10 @@ std::vector<DemangledSymbol*>* PDBUtils::parsePdb(const PDB::RawFile& rawPdbFile
 }
 
 std::vector<DemangledSymbol*>* PDBUtils::loadPdb(const char* fileName) {
-    const char* mode = "r";  // Specify the mode: read-only
-
-    MemoryMappedFileHandle pdbFile;
+    MemoryMappedFileHandle pdbFile{};
 
     try {
-        pdbFile = MemoryMappedFile::Open(fileName, mode);
+        pdbFile = MemoryMappedFile::Open(fileName, "r");
     } catch (const std::runtime_error &e) {
         Logger::info("[PDB] Error opening PDB file: " + std::string(e.what()));
         return nullptr;
