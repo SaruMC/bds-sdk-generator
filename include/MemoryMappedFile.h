@@ -1,7 +1,7 @@
-#pragma once
-
 #ifndef MEMORYMAPPEDFILE_H
 #define MEMORYMAPPEDFILE_H
+
+#pragma once
 
 #include <sys/mman.h>
 #include <sys/stat.h>

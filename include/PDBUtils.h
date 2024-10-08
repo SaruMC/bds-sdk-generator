@@ -1,7 +1,7 @@
-#pragma once
-
 #ifndef PDBUTILS_H
 #define PDBUTILS_H
+
+#pragma once
 
 #include <vector>
 #include "DemangledSymbol.h"
