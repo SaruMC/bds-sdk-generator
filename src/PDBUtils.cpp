@@ -70,7 +70,7 @@ void PDBUtils::getClassFromSymbol(const std::string& className, std::vector<Dema
         // Convention calling
         if (symbol->value.find("__cdecl " + className + "::") != std::string::npos) {
             // ToDo
-            Logger::debug(std::to_string(symbol->offset));
+            Logger::debug(className + "::" + symbol->value);
         }
     }
 }
